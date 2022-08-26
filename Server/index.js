@@ -1,13 +1,16 @@
-const express = require("express");
-const { createServer } = require("http");
-const { Server } = require("socket.io");
+const http = require('http').createServer();
 
-const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer, { /* options */ });
-
-io.on("connection", (socket) => {
-  console.log(socket.id); 
+const io = require('socket.io')(http, {
+    cors: { origin: "*" }
 });
 
-httpServer.listen(3000);
+io.on('connection', (socket) => {
+    console.log('User Connected');
+
+    socket.on('message', (message) =>     {
+        console.log(message);
+        io.emit('message', `${socket.id.substr(0,2)} said ${message}` );   
+    });
+});
+
+http.listen(8080, () => console.log('listening on http://localhost:8080') );
